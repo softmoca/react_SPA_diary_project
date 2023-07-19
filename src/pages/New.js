@@ -1,11 +1,17 @@
-const Hmoe = () => {
+import { useEffect } from "react";
+import DiaryEditor from "../components/DiaryEditor";
+
+const New = () => {
+  useEffect(() => {
+    const titleElement = document.getElementsByTagName("title")[0];
+    titleElement.innerHTML = `감정 일기장 - 새 일기`;
+  }, []);
+
   return (
     <div>
-      {" "}
-      <h1>New</h1>
-      <p>이곳은 일기 작성 페이지입니다</p>
+      <DiaryEditor />
     </div>
   );
 };
 
-export default Hmoe;
+export default New;
