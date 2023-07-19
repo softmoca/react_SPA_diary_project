@@ -1,13 +1,13 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React, { useEffect, useReducer, useRef } from "react";
+
 import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import Home from "./pages/Home";
 import New from "./pages/New";
-import Diary from "./pages/Diary";
 import Edit from "./pages/Edit";
-import RouteTest from "./compoments/RouteTest";
-import MyButton from "./compoments/MyButton";
-import MyHeader from "./compoments/MyHeader";
-import React, { useReducer, useRef } from "react";
+import Diary from "./pages/Diary";
+
 const reducer = (state, action) => {
   let newState = [];
   switch (action.type) {
@@ -32,7 +32,7 @@ const reducer = (state, action) => {
       return state;
   }
 
-  //localStorage.setItem("diary", JSON.stringify(newState));
+  localStorage.setItem("diary", JSON.stringify(newState));
   return newState;
 };
 
@@ -41,6 +41,21 @@ export const DiaryDispatchContext = React.createContext();
 
 function App() {
   const [data, dispatch] = useReducer(reducer, []);
+
+  useEffect(() => {
+    const localData = localStorage.getItem("diary");
+    if (localData) {
+      const diaryList = JSON.parse(localData).sort(
+        (a, b) => parseInt(b.id) - parseInt(a.id)
+      );
+
+      if (diaryList.length >= 1) {
+        dataId.current = parseInt(diaryList[0].id) + 1;
+        dispatch({ type: "INIT", data: diaryList });
+      }
+    }
+  }, []);
+
   const dataId = useRef(0);
   // CREATE
   const onCreate = (date, content, emotion) => {
@@ -71,6 +86,7 @@ function App() {
       },
     });
   };
+
   return (
     <DiaryStateContext.Provider value={data}>
       <DiaryDispatchContext.Provider
@@ -85,10 +101,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/new" element={<New />} />
-              <Route path="/edit" element={<Edit />} />
+              <Route path="/edit/:id" element={<Edit />} />
               <Route path="/diary/:id" element={<Diary />} />
             </Routes>
-            <RouteTest />
           </div>
         </BrowserRouter>
       </DiaryDispatchContext.Provider>
